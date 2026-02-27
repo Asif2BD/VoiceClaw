@@ -28,9 +28,8 @@ fi
 
 if [[ ! -f "$MODEL" ]]; then
   echo "Error: Whisper model not found: $MODEL" >&2
-  echo "Set WHISPER_MODEL=/path/to/ggml-base.en.bin or download it:" >&2
-  echo "  mkdir -p \"\$(dirname \"$MODEL\")\" && curl -L -o \"$MODEL\" \\" >&2
-  echo "    https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin" >&2
+  echo "Set WHISPER_MODEL=/path/to/ggml-base.en.bin to point to your model." >&2
+  echo "See README.md for one-time model download instructions." >&2
   exit 1
 fi
 

@@ -35,11 +35,13 @@ unzip voiceclaw.skill -d ~/.openclaw/custom-skills/voiceclaw
 - `whisper` — whisper.cpp binary ([install guide](https://github.com/ggerganov/whisper.cpp))
 - Whisper model: `ggml-base.en.bin` — auto-downloaded on first use, or manually:
   ```bash
+  # One-time setup only — not run by the skill scripts
   mkdir -p ~/.cache/whisper
   curl -L -o ~/.cache/whisper/ggml-base.en.bin \
     https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin
   ```
-- `piper` — TTS binary with voice models in `/opt/piper/voices/` ([install guide](https://github.com/rhasspy/piper))
+  > Set `WHISPER_MODEL=/path/to/ggml-base.en.bin` if your model is stored elsewhere.
+- `piper` — TTS binary + `.onnx` voice models ([install guide](https://github.com/rhasspy/piper)). Set `VOICECLAW_VOICES_DIR=/path/to/voices/` to point to your voice models (default: `~/.local/share/piper/voices/`)
 - `ffmpeg` — for audio format conversion
 
 ---
