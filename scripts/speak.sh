@@ -11,7 +11,7 @@ set -euo pipefail
 TEXT="${1:-}"
 OUTPUT="${2:-/tmp/voiceclaw_tts_$$.wav}"
 VOICE="${3:-en_US-lessac-medium}"
-VOICES_DIR="${VOICELAW_VOICES_DIR:-/opt/piper/voices}"
+VOICES_DIR="${VOICECLAW_VOICES_DIR:-/opt/piper/voices}"
 PIPER_BIN="${PIPER_BIN:-$(which piper 2>/dev/null || echo piper)}"
 
 if [[ -z "$TEXT" ]]; then
