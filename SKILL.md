@@ -1,6 +1,21 @@
 ---
 name: voiceclaw
 description: "Local voice I/O for OpenClaw agents. Transcribe inbound audio/voice messages using local Whisper (whisper.cpp), and generate voice replies using local Piper TTS. The skill scripts make zero network calls — all STT and TTS inference runs on-device using pre-installed local binaries. One-time model download required during setup only. Use when an agent receives a voice/audio message and should respond in both voice and text, or when any text response should be synthesized and sent as audio. Triggers on: voice messages, audio attachments, respond in voice, send as audio, speak this, voiceclaw."
+metadata:
+  {
+    "openclaw":
+      {
+        "requires": { "bins": ["whisper", "piper", "ffmpeg"] },
+        "network": "none",
+        "env":
+          [
+            { "name": "WHISPER_BIN", "description": "Path to whisper binary (default: auto-detected via which)" },
+            { "name": "WHISPER_MODEL", "description": "Path to ggml-base.en.bin model file (default: ~/.cache/whisper/ggml-base.en.bin)" },
+            { "name": "PIPER_BIN", "description": "Path to piper binary (default: auto-detected via which)" },
+            { "name": "VOICECLAW_VOICES_DIR", "description": "Path to directory containing .onnx voice model files (default: ~/.local/share/piper/voices)" }
+          ]
+      }
+  }
 ---
 
 # VoiceClaw
@@ -90,7 +105,7 @@ ffmpeg -i "$WAV" -c:a libopus -b:a 32k /tmp/reply.ogg -y -loglevel error
 
 Set `VOICECLAW_VOICES_DIR` if your voices are not at the default path:
 ```bash
-VOICECLAW_VOICES_DIR=/opt/piper/voices bash scripts/speak.sh "Hello." /tmp/reply.wav
+VOICECLAW_VOICES_DIR=/custom/path/to/voices bash scripts/speak.sh "Hello." /tmp/reply.wav
 ```
 
 ---
