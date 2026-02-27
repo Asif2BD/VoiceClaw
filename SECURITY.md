@@ -38,4 +38,4 @@ VoiceClaw is a local-only voice I/O skill. It makes **no network requests** and 
 
 ## Reporting a Vulnerability
 
-Open an issue on GitHub or contact the maintainers directly. Please do not disclose security issues publicly before they are addressed.
+Open an issue on [GitHub](https://github.com/Asif2BD/VoiceClaw/issues) or contact **M Asif Rahman** directly at [asif.im](https://asif.im). Please do not disclose security issues publicly before they are addressed.
