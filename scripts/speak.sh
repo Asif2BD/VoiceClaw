@@ -19,6 +19,13 @@ if [[ -z "$TEXT" ]]; then
   exit 1
 fi
 
+# Sanitize voice name — allow only safe characters to prevent path traversal
+VOICE=$(echo "$VOICE" | tr -cd 'a-zA-Z0-9_-')
+if [[ -z "$VOICE" ]]; then
+  echo "Error: voice name is empty after sanitization" >&2
+  exit 1
+fi
+
 MODEL="$VOICES_DIR/$VOICE.onnx"
 CONFIG="$VOICES_DIR/$VOICE.onnx.json"
 

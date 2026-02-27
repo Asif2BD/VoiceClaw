@@ -48,6 +48,13 @@ ffmpeg -i /tmp/reply.wav -c:a libopus -b:a 32k /tmp/reply.ogg -y
 | `en_GB-alba-medium` | British female |
 | more... | See SKILL.md |
 
+## Security
+
+- **All processing is local** — no audio or text is ever sent to a cloud service or external API
+- **Temporary files are cleaned up** — audio is converted to WAV in `/tmp` and deleted immediately after transcription (via bash `trap` on EXIT)
+- **Voice model selection is sanitized** — the voice name input is stripped to `[a-zA-Z0-9_-]` only, preventing path traversal attacks
+- **No network calls** — neither `transcribe.sh` nor `speak.sh` makes any network request; all inference runs on-device via local binaries (`whisper`, `piper`)
+
 ## License
 
 MIT
