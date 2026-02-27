@@ -9,7 +9,7 @@ set -euo pipefail
 AUDIO_FILE="${1:-}"
 MODEL="${2:-/root/.cache/whisper/ggml-base.en.bin}"
 WHISPER_BIN="${WHISPER_BIN:-$(which whisper 2>/dev/null || echo whisper)}"
-TMP_WAV="/tmp/voicelaw_stt_$$.wav"
+TMP_WAV="/tmp/voiceclaw_stt_$$.wav"
 
 if [[ -z "$AUDIO_FILE" ]]; then
   echo "Usage: transcribe.sh <audio_file> [model_path]" >&2

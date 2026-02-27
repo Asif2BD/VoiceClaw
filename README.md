@@ -1,4 +1,4 @@
-# 🎙️ VoiceLaw — Local Voice I/O for OpenClaw Agents
+# 🎙️ VoiceClaw — Local Voice I/O for OpenClaw Agents
 
 A local-only voice skill for [OpenClaw](https://openclaw.ai) agents. Transcribe inbound voice messages with **Whisper** and reply with synthesized speech via **Piper TTS** — no cloud, no API keys, no paid services.
 
@@ -18,12 +18,12 @@ A local-only voice skill for [OpenClaw](https://openclaw.ai) agents. Transcribe 
 ## Install via ClawhHub
 
 ```bash
-clawhub install voicelaw
+clawhub install voiceclaw
 ```
 
 ## Manual Install
 
-Copy the `voicelaw/` folder into your OpenClaw skills directory.
+Copy the `voiceclaw/` folder into your OpenClaw skills directory.
 
 ## Usage
 

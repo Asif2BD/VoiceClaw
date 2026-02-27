@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # speak.sh — Convert text to speech using local Piper TTS
 # Usage: speak.sh "text to speak" [output_file.wav] [voice]
-# Output: writes WAV to output_file (default: /tmp/voicelaw_tts.wav)
+# Output: writes WAV to output_file (default: /tmp/voiceclaw_tts.wav)
 # Available voices: en_US-amy-medium, en_US-joe-medium, en_US-lessac-medium,
 #                   en_US-kusal-medium, en_US-danny-low,
 #                   en_GB-alba-medium, en_GB-northern_english_male-medium
@@ -9,7 +9,7 @@
 set -euo pipefail
 
 TEXT="${1:-}"
-OUTPUT="${2:-/tmp/voicelaw_tts_$$.wav}"
+OUTPUT="${2:-/tmp/voiceclaw_tts_$$.wav}"
 VOICE="${3:-en_US-lessac-medium}"
 VOICES_DIR="${VOICELAW_VOICES_DIR:-/opt/piper/voices}"
 PIPER_BIN="${PIPER_BIN:-$(which piper 2>/dev/null || echo piper)}"

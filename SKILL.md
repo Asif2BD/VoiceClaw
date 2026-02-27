@@ -1,9 +1,9 @@
 ---
-name: voicelaw
-description: "Local voice I/O for OpenClaw agents. Transcribe inbound audio/voice messages using local Whisper (whisper.cpp), and generate voice replies using local Piper TTS — no cloud, no API keys. Use when an agent receives a voice/audio message and should respond in both voice and text, or when any text response should be synthesized and sent as audio. Triggers on: voice messages, audio attachments, respond in voice, send as audio, speak this, voicelaw."
+name: voiceclaw
+description: "Local voice I/O for OpenClaw agents. Transcribe inbound audio/voice messages using local Whisper (whisper.cpp), and generate voice replies using local Piper TTS — no cloud, no API keys. Use when an agent receives a voice/audio message and should respond in both voice and text, or when any text response should be synthesized and sent as audio. Triggers on: voice messages, audio attachments, respond in voice, send as audio, speak this, voiceclaw."
 ---
 
-# VoiceLaw
+# VoiceClaw
 
 Local-only voice I/O for OpenClaw agents.
 
@@ -81,7 +81,7 @@ Voice models are at `/opt/piper/voices/`.
 
 ## Agent Behavior Rules
 
-When VoiceLaw is active, apply these rules to every session:
+When VoiceClaw is active, apply these rules to every session:
 
 1. **Voice in → Voice + Text out.** If you receive a voice message, always respond with both a voice reply and the text reply. Never reply text-only to a voice message.
 
@@ -101,14 +101,14 @@ When VoiceLaw is active, apply these rules to every session:
 # 1. Receive voice message at /root/.openclaw/media/inbound/voice.ogg
 
 # 2. Transcribe
-TRANSCRIPT=$(bash path/to/voicelaw/scripts/transcribe.sh \
+TRANSCRIPT=$(bash path/to/voiceclaw/scripts/transcribe.sh \
   /root/.openclaw/media/inbound/voice.ogg)
 
 # 3. Generate response text (your normal agent logic)
 RESPONSE="Got it. The deployment is complete and all checks passed."
 
 # 4. Speak the response
-WAV=$(bash path/to/voicelaw/scripts/speak.sh "$RESPONSE" /tmp/reply_$$.wav)
+WAV=$(bash path/to/voiceclaw/scripts/speak.sh "$RESPONSE" /tmp/reply_$$.wav)
 ffmpeg -i "$WAV" -c:a libopus -b:a 32k /tmp/reply_$$.ogg -y -loglevel error
 
 # 5. Send voice (use message tool)
