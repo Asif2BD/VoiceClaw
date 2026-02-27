@@ -1,32 +1,64 @@
 ---
 name: voiceclaw
-description: "Local voice I/O for OpenClaw agents. Transcribe inbound audio/voice messages using local Whisper (whisper.cpp), and generate voice replies using local Piper TTS — no cloud, no API keys. Use when an agent receives a voice/audio message and should respond in both voice and text, or when any text response should be synthesized and sent as audio. Triggers on: voice messages, audio attachments, respond in voice, send as audio, speak this, voiceclaw."
+description: "Local voice I/O for OpenClaw agents. Transcribe inbound audio/voice messages using local Whisper (whisper.cpp), and generate voice replies using local Piper TTS — no cloud, no API keys, no network calls during operation. Use when an agent receives a voice/audio message and should respond in both voice and text, or when any text response should be synthesized and sent as audio. Triggers on: voice messages, audio attachments, respond in voice, send as audio, speak this, voiceclaw."
+requires:
+  binaries:
+    - whisper
+    - piper
+    - ffmpeg
+  files:
+    - description: "Whisper STT model (ggml-base.en.bin)"
+      path: "$WHISPER_MODEL or ~/.cache/whisper/ggml-base.en.bin"
+      download: "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin"
+    - description: "Piper voice models (*.onnx)"
+      path: "$VOICECLAW_VOICES_DIR or ~/.local/share/piper/voices/"
+network: none
 ---
 
 # VoiceClaw
 
-Local-only voice I/O for OpenClaw agents.
+Local-only voice I/O for OpenClaw agents. **Zero network calls during operation** — all STT and TTS inference runs on-device using pre-installed binaries.
 
 - **STT:** Whisper (whisper.cpp) — `ggml-base.en.bin` model
-- **TTS:** Piper — multiple English voices, runs offline
+- **TTS:** Piper — multiple English voices, runs fully offline
 - **No cloud, no paid APIs, no API keys required**
 
 ---
 
-## Setup Check
+## Requirements
+
+This skill requires three binaries installed on the system:
+
+| Binary | Purpose | Install |
+|---|---|---|
+| `whisper` | Speech-to-text (whisper.cpp) | [whisper.cpp releases](https://github.com/ggerganov/whisper.cpp/releases) |
+| `piper` | Text-to-speech | `pip install piper-tts` |
+| `ffmpeg` | Audio format conversion | `apt install ffmpeg` |
+
+Plus model files:
+- **Whisper model:** `ggml-base.en.bin` — set `WHISPER_MODEL=/path/to/ggml-base.en.bin`
+- **Piper voices:** `.onnx` files — set `VOICECLAW_VOICES_DIR=/path/to/voices/`
+
+### Setup Check
 
 ```bash
-which whisper && echo "STT: OK"
-ls /root/.cache/whisper/ggml-base.en.bin && echo "Model: OK"
-which piper && ls /opt/piper/voices/*.onnx | head -3 && echo "TTS: OK"
+which whisper && echo "STT binary: OK"
+which piper && echo "TTS binary: OK"
+which ffmpeg && echo "ffmpeg: OK"
+ls "${WHISPER_MODEL:-$HOME/.cache/whisper/ggml-base.en.bin}" && echo "STT model: OK"
+ls "${VOICECLAW_VOICES_DIR:-$HOME/.local/share/piper/voices/}"/*.onnx 2>/dev/null | head -1 && echo "TTS voices: OK"
 ```
 
-If Whisper model is missing:
+### One-time model download (if missing)
+
 ```bash
-mkdir -p /root/.cache/whisper
-curl -L -o /root/.cache/whisper/ggml-base.en.bin \
+# Whisper model (~150MB, downloaded once — not used during normal operation)
+mkdir -p "$HOME/.cache/whisper"
+curl -L -o "$HOME/.cache/whisper/ggml-base.en.bin" \
   https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin
 ```
+
+> ⚠️ The `curl` above is a **one-time setup step only**. The skill scripts (`transcribe.sh`, `speak.sh`) make **zero network calls** during operation.
 
 ---
 
@@ -49,7 +81,7 @@ Then process `$TRANSCRIPT` as if it were a text message. Always include the tran
 Generate a voice reply and send it alongside your text response:
 
 ```bash
-# Step 1: Generate WAV
+# Step 1: Generate WAV (no network call — local Piper TTS)
 WAV=$(bash scripts/speak.sh "Your response text here" /tmp/reply.wav en_US-lessac-medium)
 
 # Step 2: Convert to OGG Opus (required for Telegram voice messages)
@@ -71,11 +103,11 @@ For other platforms (WhatsApp, Signal), WAV or OGG both work — check platform 
 | `en_US-amy-medium` | Warm American female |
 | `en_US-joe-medium` | American male |
 | `en_US-kusal-medium` | Expressive American male |
-| `en_US-danny-low` | Deep American male (low quality, fast) |
+| `en_US-danny-low` | Deep American male (fast) |
 | `en_GB-alba-medium` | British female |
 | `en_GB-northern_english_male-medium` | Northern British male |
 
-Voice models are at `/opt/piper/voices/`.
+Voice models default to `$VOICECLAW_VOICES_DIR` (set this env var to override the default path).
 
 ---
 
@@ -98,16 +130,15 @@ When VoiceClaw is active, apply these rules to every session:
 ## Full Example (Telegram)
 
 ```bash
-# 1. Receive voice message at /root/.openclaw/media/inbound/voice.ogg
+# 1. Receive voice message at /path/to/inbound/voice.ogg
 
-# 2. Transcribe
-TRANSCRIPT=$(bash path/to/voiceclaw/scripts/transcribe.sh \
-  /root/.openclaw/media/inbound/voice.ogg)
+# 2. Transcribe (local whisper — no network)
+TRANSCRIPT=$(bash path/to/voiceclaw/scripts/transcribe.sh /path/to/inbound/voice.ogg)
 
 # 3. Generate response text (your normal agent logic)
 RESPONSE="Got it. The deployment is complete and all checks passed."
 
-# 4. Speak the response
+# 4. Speak the response (local piper — no network)
 WAV=$(bash path/to/voiceclaw/scripts/speak.sh "$RESPONSE" /tmp/reply_$$.wav)
 ffmpeg -i "$WAV" -c:a libopus -b:a 32k /tmp/reply_$$.ogg -y -loglevel error
 
@@ -124,16 +155,9 @@ ffmpeg -i "$WAV" -c:a libopus -b:a 32k /tmp/reply_$$.ogg -y -loglevel error
 
 | Issue | Fix |
 |---|---|
-| `whisper: command not found` | `apt install whisper` or check PATH |
-| `ggml-base.en.bin not found` | Download model (see Setup Check above) |
-| `piper: command not found` | `pip install piper-tts` or check `/root/.local/bin/` |
-| Voice model missing | `ls /opt/piper/voices/` — pick an available voice |
+| `whisper: command not found` | Install whisper.cpp binary and add to PATH |
+| Whisper model not found | Set `WHISPER_MODEL=/path/to/ggml-base.en.bin` or run one-time download above |
+| `piper: command not found` | `pip install piper-tts` or check `~/.local/bin/` |
+| Voice model missing | Set `VOICECLAW_VOICES_DIR=/path/to/voices/` and ensure `.onnx` files exist |
 | OGG won't play on Telegram | Ensure `-c:a libopus` in ffmpeg conversion |
 | Audio too quiet/fast | Add `--volume 1.5` or `--length-scale 1.1` to piper call |
-
----
-
-## Roadmap
-
-### v1.1 (planned)
-- Add voice name sanitization in `speak.sh` to prevent path traversal (flagged by Morpheus security review — low risk, not a blocker)
