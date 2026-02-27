@@ -130,3 +130,10 @@ ffmpeg -i "$WAV" -c:a libopus -b:a 32k /tmp/reply_$$.ogg -y -loglevel error
 | Voice model missing | `ls /opt/piper/voices/` — pick an available voice |
 | OGG won't play on Telegram | Ensure `-c:a libopus` in ffmpeg conversion |
 | Audio too quiet/fast | Add `--volume 1.5` or `--length-scale 1.1` to piper call |
+
+---
+
+## Roadmap
+
+### v1.1 (planned)
+- Add voice name sanitization in `speak.sh` to prevent path traversal (flagged by Morpheus security review — low risk, not a blocker)
