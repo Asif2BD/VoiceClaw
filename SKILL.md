@@ -27,7 +27,7 @@ Local-only voice I/O for OpenClaw agents.
 - **Script network calls: none** — `transcribe.sh` and `speak.sh` make zero network requests
 - **No cloud APIs, no API keys required**
 
-> ⚠️ **Setup note:** A one-time `curl` download of the Whisper model (~150MB) is needed before first use. This is a setup step — not part of the scripts themselves.
+> ⚠️ **Setup note:** The Whisper model file (~150MB) must be downloaded once before first use. See README.md for instructions. The skill scripts make no network requests.
 
 ---
 
@@ -67,13 +67,11 @@ ls "${WHISPER_MODEL:-$HOME/.cache/whisper/ggml-base.en.bin}" && echo "STT model:
 ls "${VOICECLAW_VOICES_DIR:-$HOME/.local/share/piper/voices}"/*.onnx 2>/dev/null | head -1 && echo "TTS voices: OK"
 ```
 
-## One-time Model Download (setup only — not a script network call)
+## First-time Setup
 
-```bash
-mkdir -p "$HOME/.cache/whisper"
-curl -L -o "$HOME/.cache/whisper/ggml-base.en.bin" \
-  https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin
-```
+Before using this skill, ensure the Whisper model file exists at `$WHISPER_MODEL` (default: `~/.cache/whisper/ggml-base.en.bin`) and Piper voice models exist at `$VOICECLAW_VOICES_DIR` (default: `~/.local/share/piper/voices/`).
+
+See **README.md** for one-time download instructions. The skill scripts themselves make no network requests.
 
 ---
 
